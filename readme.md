@@ -23,6 +23,8 @@ This ~~is~~ *will become* a small, standalone Windows application built in Pytho
   
 - **Simple GUI:** A straightforward interface with a side-by-side view for input and output.
 
+- **DARK MODE** 🌚🌚🌚 *plus super secret 1337 mode for all you trve cybercrimefighters with rizz/ricing*
+
     
 ### How it Works
 
@@ -36,7 +38,7 @@ This ~~is~~ *will become* a small, standalone Windows application built in Pytho
 
 ### To-Do *Soon*™️:
 - Pack it into an .exe that can be run on a Windows Sandbox without any dependencies
-- DARK MODE 🌚🌚🌚
+
 
 ### 🤝 Contributing
 
