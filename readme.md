@@ -1,4 +1,7 @@
 
+![alt text](dark-screenshot.png)
+![alt text](light-screenshot.png)
+
 # 🔒 SOC Incident Anonymizer
 
 Anonymize sensitive information in SOC incident reports before sharing with an LLM and de-anonymize the results for final reporting.

@@ -1,4 +1,4 @@
-On August 20, 2025, JubranCorp received a report regarding a phishing attempt targeting employees within the organization. The phishing email was sent from phishing@example.com and was designed to appear as a legitimate communication from the company's HR department.
+On August 20, 2025, JubranCorp received a report regarding a phishing attempt targeting employees within the organization. The phishing email was sent from phishing@example.com and was designed to appear as a legitimate communication from the company's HR department. It was sent to jane.smith@company.com through the SuperSecretMainframeVPN.
 
 Details of the Incident:
 
