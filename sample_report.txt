@@ -1,0 +1,9 @@
+On August 20, 2025, JubranCorp received a report regarding a phishing attempt targeting employees within the organization. The phishing email was sent from phishing@example.com and was designed to appear as a legitimate communication from the company's HR department.
+
+Details of the Incident:
+
+Email Address of Attacker: phishing@example.com
+Targeted Employee Email: jane.smith@company.com
+IP Address of the Attacker: 192.168.1.105
+Device Hostname of Targeted Employee: DESKTOP-JANE
+File Path of Downloaded Phishing Document: C:\Users\Jane\Downloads\Phishing_Document.docx
