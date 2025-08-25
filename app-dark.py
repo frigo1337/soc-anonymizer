@@ -206,7 +206,35 @@ class App(tk.Tk):
         self.title("SOC Incident Anonymizer")
         self.geometry("1100x650")
         self.an = Anonymizer()
+        
+        # Dark mode state
+        self.dark_mode = False
+        
+        # Color schemes
+        self.light_colors = {
+            'bg': '#ffffff',
+            'fg': '#000000',
+            'text_bg': '#ffffff',
+            'text_fg': '#000000',
+            'button_bg': '#f0f0f0',
+            'button_fg': '#000000',
+            'select_bg': '#0078d4',
+            'select_fg': '#ffffff'
+        }
+        
+        self.dark_colors = {
+            'bg': '#2d2d2d',
+            'fg': '#ffffff',
+            'text_bg': '#1e1e1e',
+            'text_fg': '#ffffff',
+            'button_bg': '#404040',
+            'button_fg': '#ffffff',
+            'select_bg': '#0078d4',
+            'select_fg': '#ffffff'
+        }
+        
         self._build_ui()
+        self.apply_theme()
 
     def _build_ui(self):
         toolbar = ttk.Frame(self)
@@ -220,6 +248,10 @@ class App(tk.Tk):
         btn_set_host.pack(side=tk.LEFT, padx=4)
         btn_custom = ttk.Button(toolbar, text="Custom Anonymize", command=self.on_custom)
         btn_custom.pack(side=tk.LEFT, padx=4)
+        
+        # Dark mode toggle button
+        self.btn_dark_mode = ttk.Button(toolbar, text="🌙 Dark Mode", command=self.toggle_dark_mode)
+        self.btn_dark_mode.pack(side=tk.RIGHT, padx=4)
 
         panes = ttk.Panedwindow(self, orient=tk.HORIZONTAL)
         panes.pack(fill=tk.BOTH, expand=True, padx=8, pady=6)
@@ -239,6 +271,68 @@ class App(tk.Tk):
         btn_anonymize.pack(side=tk.LEFT, padx=4)
         btn_deanonymize = ttk.Button(actions, text="← De-anonymize", command=self.on_deanonymize)
         btn_deanonymize.pack(side=tk.LEFT, padx=4)
+
+    def toggle_dark_mode(self):
+        self.dark_mode = not self.dark_mode
+        self.apply_theme()
+
+    def apply_theme(self):
+        colors = self.dark_colors if self.dark_mode else self.light_colors
+        
+        # Update main window
+        self.configure(bg=colors['bg'])
+        
+        # Update text widgets
+        self.input_text.configure(
+            bg=colors['text_bg'],
+            fg=colors['text_fg'],
+            insertbackground=colors['text_fg'],
+            selectbackground=colors['select_bg'],
+            selectforeground=colors['select_fg']
+        )
+        
+        self.output_text.configure(
+            bg=colors['text_bg'],
+            fg=colors['text_fg'],
+            insertbackground=colors['text_fg'],
+            selectbackground=colors['select_bg'],
+            selectforeground=colors['select_fg']
+        )
+        
+        # Update button text and icon
+        if self.dark_mode:
+            self.btn_dark_mode.configure(text="☀️ Light Mode")
+        else:
+            self.btn_dark_mode.configure(text="🌙 Dark Mode")
+        
+        # Configure ttk style for buttons and frames
+        style = ttk.Style()
+        
+        if self.dark_mode:
+            # Dark theme configuration
+            style.theme_use('clam')  # Use clam theme as base for better customization
+            
+            # Configure frame colors
+            style.configure('TFrame', background=colors['bg'])
+            style.configure('TPanedwindow', background=colors['bg'])
+            
+            # Configure button colors
+            style.configure('TButton',
+                          background=colors['button_bg'],
+                          foreground=colors['button_fg'],
+                          bordercolor=colors['button_bg'],
+                          lightcolor=colors['button_bg'],
+                          darkcolor=colors['button_bg'])
+            
+            style.map('TButton',
+                     background=[('active', '#505050'),
+                               ('pressed', '#606060')])
+        else:
+            # Light theme - use default
+            try:
+                style.theme_use('winnative')  # Windows native theme
+            except:
+                style.theme_use('default')    # Fallback to default
 
     def on_new(self):
         if messagebox.askyesno("Confirm", "Start new session and clear mapping and text?"):

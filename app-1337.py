@@ -206,7 +206,59 @@ class App(tk.Tk):
         self.title("SOC Incident Anonymizer")
         self.geometry("1100x650")
         self.an = Anonymizer()
+        
+        # Theme state
+        self.dark_mode = False
+        self.matrix_mode = False
+        
+        # Super omega secret key sequence for 1337 mode
+        self.key_sequence = []
+        self.secret_combo = ['Control_L', 'Shift_L', '1', '3', '3', '7']
+        
+        # Matrix animation variables
+        self.matrix_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;':\",./<>?"
+        self.matrix_animation_id = None
+        
+        # Color schemes
+        self.light_colors = {
+            'bg': '#ffffff',
+            'fg': '#000000',
+            'text_bg': '#ffffff',
+            'text_fg': '#000000',
+            'button_bg': '#f0f0f0',
+            'button_fg': '#000000',
+            'select_bg': '#0078d4',
+            'select_fg': '#ffffff'
+        }
+        
+        self.dark_colors = {
+            'bg': '#2d2d2d',
+            'fg': '#ffffff',
+            'text_bg': '#1e1e1e',
+            'text_fg': '#ffffff',
+            'button_bg': '#404040',
+            'button_fg': '#ffffff',
+            'select_bg': '#0078d4',
+            'select_fg': '#ffffff'
+        }
+        
+        self.matrix_colors = {
+            'bg': '#000000',
+            'fg': '#00ff00',
+            'text_bg': '#001100',  # Very dark green instead of pure black
+            'text_fg': '#00ff00',
+            'button_bg': '#001100',
+            'button_fg': '#00ff00',
+            'select_bg': '#003300',
+            'select_fg': '#00ff00'
+        }
+        
         self._build_ui()
+        self.apply_theme()
+        
+        # Bind key events for secret combo
+        self.bind_all('<KeyPress>', self.on_key_press)
+        self.focus_set()  # Make sure window can receive key events
 
     def _build_ui(self):
         toolbar = ttk.Frame(self)
@@ -220,6 +272,13 @@ class App(tk.Tk):
         btn_set_host.pack(side=tk.LEFT, padx=4)
         btn_custom = ttk.Button(toolbar, text="Custom Anonymize", command=self.on_custom)
         btn_custom.pack(side=tk.LEFT, padx=4)
+        
+        # Dark mode toggle button
+        if self.matrix_mode:
+            self.btn_dark_mode = ttk.Button(toolbar, text="🔋 1337 MODE", command=self.toggle_dark_mode)
+        else:
+            self.btn_dark_mode = ttk.Button(toolbar, text="🌙 Dark Mode", command=self.toggle_dark_mode)
+        self.btn_dark_mode.pack(side=tk.RIGHT, padx=4)
 
         panes = ttk.Panedwindow(self, orient=tk.HORIZONTAL)
         panes.pack(fill=tk.BOTH, expand=True, padx=8, pady=6)
@@ -232,6 +291,17 @@ class App(tk.Tk):
         self.input_text.pack(fill=tk.BOTH, expand=True)
         self.output_text = ScrolledText(right, wrap=tk.WORD, font=("Consolas", 11), state=tk.NORMAL)
         self.output_text.pack(fill=tk.BOTH, expand=True)
+        
+        # Matrix background canvas (initially hidden)
+        self.matrix_canvas = tk.Canvas(self, bg='#000000', highlightthickness=0)
+        self.matrix_drops = []
+        
+        # Store references to text widgets for matrix effects
+        self.text_widgets = [self.input_text, self.output_text]
+        
+        # Ensure Ctrl+A works on all platforms
+        self.input_text.bind('<Control-a>', self._select_all)
+        self.output_text.bind('<Control-a>', self._select_all)
 
         actions = ttk.Frame(self)
         actions.pack(side=tk.BOTTOM, fill=tk.X, padx=8, pady=6)
@@ -239,6 +309,199 @@ class App(tk.Tk):
         btn_anonymize.pack(side=tk.LEFT, padx=4)
         btn_deanonymize = ttk.Button(actions, text="← De-anonymize", command=self.on_deanonymize)
         btn_deanonymize.pack(side=tk.LEFT, padx=4)
+
+    def toggle_dark_mode(self):
+        self.dark_mode = not self.dark_mode
+        self.apply_theme()
+
+    def on_key_press(self, event):
+        """Handle key presses for secret combo detection"""
+        key = event.keysym
+        
+        # Add key to sequence
+        self.key_sequence.append(key)
+        
+        # Keep only last 6 keys (length of our secret combo)
+        if len(self.key_sequence) > 6:
+            self.key_sequence.pop(0)
+        
+        # Check if we have the secret combo
+        if self.key_sequence == self.secret_combo:
+            self.activate_matrix_mode()
+            self.key_sequence = []  # Reset sequence
+    
+    def activate_matrix_mode(self):
+        """Activate the secret 1337 Matrix mode"""
+        self.matrix_mode = True
+        self.dark_mode = False  # Override dark mode
+        self.title("SOC Incident Anonymizer - 1337 M4TR1X M0D3")
+        self.apply_theme()
+        self.start_matrix_animation()
+        
+        # Show a brief message
+        messagebox.showinfo("1337 MODE ACTIVATED", "ALL YOUR BASE ARE BELONG TO US")
+
+    def toggle_dark_mode(self):
+        if self.matrix_mode:
+            # Exit matrix mode
+            self.matrix_mode = False
+            self.stop_matrix_animation()
+            self.title("SOC Incident Anonymizer")
+        else:
+            # Normal dark/light toggle
+            self.dark_mode = not self.dark_mode
+        self.apply_theme()
+
+    def start_matrix_animation(self):
+        """Start the matrix rain animation"""
+        if self.matrix_animation_id:
+            self.after_cancel(self.matrix_animation_id)
+        
+        # Don't use background canvas - just add subtle effects to text widgets
+        self.add_matrix_text_effects()
+
+    def add_matrix_text_effects(self):
+        """Add Matrix-style visual effects to text widgets"""
+        # Add some Matrix-style placeholder text with blinking effect
+        if not hasattr(self, 'matrix_blink_state'):
+            self.matrix_blink_state = True
+        
+        # Add Matrix-style border effect by configuring relief
+        for widget in self.text_widgets:
+            widget.configure(
+                relief='ridge',
+                borderwidth=2,
+                highlightbackground='#00ff00',
+                highlightcolor='#00ff00',
+                highlightthickness=1
+            )
+        
+        # Start subtle blinking animation for cursor
+        self.animate_matrix_cursor()
+    
+    def animate_matrix_cursor(self):
+        """Animate Matrix-style cursor effects"""
+        if not self.matrix_mode:
+            return
+            
+        # Toggle cursor visibility for blinking effect
+        self.matrix_blink_state = not self.matrix_blink_state
+        cursor_color = '#00ff00' if self.matrix_blink_state else '#003300'
+        
+        for widget in self.text_widgets:
+            widget.configure(insertbackground=cursor_color)
+        
+        # Schedule next blink
+        self.matrix_animation_id = self.after(500, self.animate_matrix_cursor)
+
+    def animate_matrix(self):
+        """Simplified matrix animation - removed complex canvas animation"""
+        # This method is now simplified - the complex canvas animation was causing issues
+        pass
+
+    def stop_matrix_animation(self):
+        """Stop the matrix animation"""
+        if self.matrix_animation_id:
+            self.after_cancel(self.matrix_animation_id)
+            self.matrix_animation_id = None
+        
+        # Reset text widget styling
+        for widget in self.text_widgets:
+            widget.configure(
+                relief='sunken',
+                borderwidth=1,
+                highlightbackground='SystemButtonFace',
+                highlightcolor='SystemButtonFace',
+                highlightthickness=1
+            )
+
+    def apply_theme(self):
+        if self.matrix_mode:
+            colors = self.matrix_colors
+        else:
+            colors = self.dark_colors if self.dark_mode else self.light_colors
+        
+        # Update main window
+        self.configure(bg=colors['bg'])
+        
+        # Update text widgets
+        for widget in self.text_widgets:
+            widget.configure(
+                bg=colors['text_bg'],
+                fg=colors['text_fg'],
+                insertbackground=colors['text_fg'],
+                selectbackground=colors['select_bg'],
+                selectforeground=colors['select_fg']
+            )
+            
+            # Matrix mode special effects
+            if self.matrix_mode:
+                widget.configure(
+                    font=("Courier", 11, "bold"),
+                    cursor="dotbox"  # Matrix-style cursor
+                )
+            else:
+                widget.configure(
+                    font=("Consolas", 11),
+                    cursor="xterm"  # Normal cursor
+                )
+        
+        # Update button text and icon
+        if self.matrix_mode:
+            self.btn_dark_mode.configure(text="🔌 EXIT M4TR1X")
+        elif self.dark_mode:
+            self.btn_dark_mode.configure(text="☀️ Light Mode")
+        else:
+            self.btn_dark_mode.configure(text="🌙 Dark Mode")
+        
+        # Configure ttk style for buttons and frames
+        style = ttk.Style()
+        
+        if self.matrix_mode:
+            # Matrix theme configuration
+            style.theme_use('clam')
+            
+            style.configure('TFrame', background=colors['bg'])
+            style.configure('TPanedwindow', background=colors['bg'])
+            
+            style.configure('TButton',
+                          background=colors['button_bg'],
+                          foreground=colors['button_fg'],
+                          bordercolor='#00ff00',
+                          lightcolor=colors['button_bg'],
+                          darkcolor=colors['button_bg'],
+                          relief='ridge')
+            
+            style.map('TButton',
+                     background=[('active', '#003300'),
+                               ('pressed', '#005500')],
+                     foreground=[('active', '#00ff00')])
+                     
+        elif self.dark_mode:
+            # Dark theme configuration
+            style.theme_use('clam')  # Use clam theme as base for better customization
+            
+            # Configure frame colors
+            style.configure('TFrame', background=colors['bg'])
+            style.configure('TPanedwindow', background=colors['bg'])
+            
+            # Configure button colors
+            style.configure('TButton',
+                          background=colors['button_bg'],
+                          foreground=colors['button_fg'],
+                          bordercolor=colors['button_bg'],
+                          lightcolor=colors['button_bg'],
+                          darkcolor=colors['button_bg'])
+            
+            style.map('TButton',
+                     background=[('active', '#505050'),
+                               ('pressed', '#606060')])
+        else:
+            # Light theme - use default
+            try:
+                style.theme_use('winnative')  # Windows native theme
+            except:
+                style.theme_use('default')    # Fallback to default
 
     def on_new(self):
         if messagebox.askyesno("Confirm", "Start new session and clear mapping and text?"):
@@ -298,6 +561,13 @@ class App(tk.Tk):
         self.output_text.delete("1.0", tk.END)
         self.output_text.insert(tk.END, text)
         self.output_text.config(state=tk.NORMAL)
+    
+    def _select_all(self, event):
+        """Handle Ctrl+A to select all text in text widgets"""
+        event.widget.tag_add(tk.SEL, "1.0", tk.END)
+        event.widget.mark_set(tk.INSERT, "1.0")
+        event.widget.see(tk.INSERT)
+        return 'break'  # Prevent default handling
 
 
 if __name__ == "__main__":
