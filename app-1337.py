@@ -310,9 +310,9 @@ class App(tk.Tk):
         btn_deanonymize = ttk.Button(actions, text="← De-anonymize", command=self.on_deanonymize)
         btn_deanonymize.pack(side=tk.LEFT, padx=4)
 
-    def toggle_dark_mode(self):
-        self.dark_mode = not self.dark_mode
-        self.apply_theme()
+    # def toggle_dark_mode(self):
+    #     self.dark_mode = not self.dark_mode
+    #     self.apply_theme()
 
     def on_key_press(self, event):
         """Handle key presses for secret combo detection"""
