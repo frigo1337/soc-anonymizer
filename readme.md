@@ -40,7 +40,8 @@ This ~~is~~ *will become* a small, standalone Windows application built in Pytho
 4. **De-anonymize:** When the LLM provides its output, paste it back into the **Input** pane and click `← De-anonymize` to restore the original sensitive values in the output.
 
 ### To-Do *Soon*™️:
-- Pack it into an .exe that can be run on a Windows Sandbox without any dependencies
+- Fix some bugs - mainly regarding "Custom Anonymize" and "Host prefix" that are not reset in each session. The workaround for that right now is to restart the program
+- Include prompt templates that can be prefixed to the anonymized text. Ideally the analyst would just have to input some information, choose incident category, press anonymize and then have a ready prompt to work with.
 
 
 ### 🤝 Contributing
